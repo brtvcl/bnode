@@ -1,0 +1,79 @@
+*
+{
+    margin:0px;
+    padding:0px;
+    box-sizing: border-box;
+}
+
+#container 
+{
+    width: 400px;
+    height: 300px;
+    border: 2px solid lightgray;
+}
+
+.delBtn
+{
+    float: left;
+    margin-top: 10px;
+    margin-left: 10px;
+    width:15px;
+    height:15px;
+    background-color: tomato;
+    border-radius: 50%;
+    cursor:default;
+    transition: 0.3s;
+}
+
+.delBtn:hover
+{
+    background-color: lightcoral;
+}
+
+.btn
+{
+    width:40px;
+}
+
+
+
+.connection
+{
+    width:15px;
+    height:15px;
+    border-radius: 50%;
+    transition: 0.3s;
+    background-color: black;
+}
+
+#a
+{
+    left:200px;
+    top:300px;
+    position: absolute;
+}
+
+.connection:hover
+{
+    opacity:50%;
+}
+
+
+.node 
+{
+    width: 200px;
+    height: 150px;
+    position: absolute;
+    background-color: lightgreen;
+    border-radius: 10px;
+}
+  
+.nodeheader
+{
+    width: 200px;
+    height: 35px;
+    cursor: grab;
+    background-color: black;
+    border-radius: 10px 10px 0px 0px;
+}
+  
