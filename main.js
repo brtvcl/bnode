@@ -219,14 +219,23 @@ function move(e)
         //Tüm pathları döngüde güncelle
         for(let i=0; i < all_paths.length ; i++)
         {
-            var path_points = all_paths[i].getAttribute("d"); //Nokta koordinatları
-            var start_point= path_points.split(" ");    //Başlangıç koordinatı  
-            var connections = node.getElementsByClassName("connection"); //Connection obje
+            let path_points = all_paths[i].getAttribute("d"); //Nokta koordinatları
+            let all_points= path_points.split(" ");    //Başlangıç koordinatı  
+            let connections = node.getElementsByClassName("connection"); //Connection obje
 
-            var rect  = connections[0].getBoundingClientRect();
-            var l = rect.left+7;
-            var t = rect.top+7;
-            var coords = "M"+l+","+ t +" "+ start_point[1]
+            let rect  = connections[0].getBoundingClientRect();
+            let startx = rect.left+7;
+            let starty = rect.top+7;
+            let endx = all_points[2].split(",")[0];
+            let endy = all_points[2].split(",")[1];
+            let curvex = Math.abs( (endx-startx)/2 );
+            if (curvex<50)
+            { curvex = 50; }
+
+            let coords = "M" +startx + "," + starty 
+            +" C"+ (startx+curvex) + "," + starty
+            +","+ (endx-curvex) + "," + endy   
+            +" "+ endx + "," + endy;
 
             all_paths[i].setAttribute("d",coords)
         }
@@ -235,10 +244,29 @@ function move(e)
     //Point bağla (path oluştur)
     if (pointdrag)
     {
+        /*
         var rect = point.getBoundingClientRect();
         var l = rect.left+7;
         var t = rect.top+7;
         var coords = "M"+l+","+ t +" "+ e.x + ","+ e.y;
+        */
+
+        let rect  = point.getBoundingClientRect();
+        let startx = rect.left+7;
+        let starty = rect.top+7;
+        let endx = e.x;
+        let endy = e.y;
+        let curvex = Math.abs( (endx-startx)/2 );
+        if (curvex<50)
+            { curvex = 50; }
+
+        coords = "M" +startx + "," + starty 
+        +" C"+ (startx+curvex) + "," + starty 
+        +","+ (endx-curvex) + "," + endy 
+        +" "+ endx + "," + endy;
+
+        console.log(coords);
+
         newPath.setAttribute("d",coords);
     }
 }
