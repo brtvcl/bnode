@@ -2,9 +2,6 @@
 var active =  false;
 var pointdrag = false;
 
-
-pathCount = 0;  
-
 //arraylar
 let nodes = []; 
 let paths = [];
@@ -13,6 +10,20 @@ let points = [];
 document.addEventListener("mouseup", moveEnd, false);
 document.addEventListener("mousemove", move, false);
 document.addEventListener("mousedown", moveStart, false);
+
+//--------------------------------------------------
+//SVG Oluştur
+{
+
+    var svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("width","1280px");
+    svg.setAttribute("height","620px");
+    svg.style.position = "absolute";
+    svg.style.top=0;
+    svg.style.left=0;
+    svg.style.zIndex=-1;
+    document.getElementById("container").appendChild(svg);   
+}
 
 //Node objesi tanımla
 function Node(_id)
@@ -44,7 +55,7 @@ function Node(_id)
         if (points[i] == undefined || points[i]._id == "empty") 
         {
             points[i] = new Point("point" + i, "output", _id);
-            console.log(i+ ". indise yeni point obje koyuldu");
+            console.log(i+ ". indise yeni output point obje koyuldu");
 
             //Output point element
             let opoint = document.createElement("div");
@@ -53,7 +64,27 @@ function Node(_id)
             newNode.appendChild(opoint);
             break;
         }
+
     }
+
+    //Input point instance
+    for (let i = 0; i <= points.length; i++) 
+    {
+        if ( points[i] == undefined || points[i]._id == "empty") 
+        {
+            points[i] = new Point("point" + i, "input", _id);
+            console.log(i+ ". indise yeni input point obje koyuldu");
+
+            //Output point element
+            let opoint = document.createElement("div");
+            opoint.setAttribute("class","connection input");
+            opoint.setAttribute("id","point" + i );
+            newNode.appendChild(opoint);
+            break;
+        }
+
+    }
+
 
 }
 
@@ -73,19 +104,7 @@ function Point(_id, type, parent_node_id)
     this.parent_node_id = parent_node_id;
 }
 
-//--------------------------------------------------
-//SVG Oluştur
-{
 
-    var svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
-    svg.setAttribute("width","1280px");
-    svg.setAttribute("height","620px");
-    svg.style.position = "absolute";
-    svg.style.top=0;
-    svg.style.left=0;
-    svg.style.zIndex=-1;
-    document.getElementById("container").appendChild(svg);   
-}
 
 //---------------------------------------------------
 //Node ekle
@@ -104,6 +123,63 @@ function nodeEkle()
 
 }
 
+
+
+//-----------------------------------------------------
+//Export script
+function output()
+{
+    //Get exporting media
+    let output_area = document.getElementById("result"); 
+    
+    //Clear exporting media
+    output_area.innerHTML = "";
+
+    
+
+    //Nodes
+    output_area.innerHTML += "//Nodelar \n";
+    for (let i = 0; i < nodes.length; i++) 
+    {
+        if (nodes[i]._id != "empty")
+        {
+            output_area.innerHTML += "// \n";
+            output_area.innerHTML += nodes[i]._id;
+            output_area.innerHTML += "\n";
+        }
+    }
+
+    
+    //Points
+    output_area.innerHTML += "//Pointler \n";
+    for (let i = 0; i < points.length; i++) 
+    {
+        if (points[i]._id != "empty")
+        {
+            output_area.innerHTML += "// \n";
+            output_area.innerHTML += points[i]._id +"\n";
+            output_area.innerHTML += points[i].parent_node_id +"\n";
+            output_area.innerHTML += points[i].type+"\n";
+        }
+    }
+
+    //Paths
+    output_area.innerHTML += "//Pathlar \n";
+    for (let i = 0; i < paths.length; i++) 
+    {
+        if (paths[i]._id != "empty")
+        {
+            output_area.innerHTML += "// \n";
+            output_area.innerHTML += paths[i]._id + "\n";
+            output_area.innerHTML += paths[i].parent_point_id + "\n";
+            output_area.innerHTML += paths[i].target_point_id + "\n";
+        }
+        
+    }
+
+
+
+}
 
 //------------------------------------------------------
 //Node sil
@@ -142,12 +218,77 @@ function nodeSil(del)
             }
 
             points[i] = new Point("empty", "empty", "empty");
-            break;
         }
     }
 
     delNode.remove();
     
+    
+}
+
+//-----------------------------------------------------
+//Path Snap to Input
+function snap_to_input(self_id) 
+{
+    
+    //Path'ın çıktığı output self_id oluyor
+
+    let range = 40;
+
+    //Aynı node'un kendisine bağlanmaması için parenti bul
+    for (let i = 0; i < points.length; i++) 
+    {
+        if (points[i]._id==self_id)
+        {
+            console.log(points[i].parent_node_id);
+            point_parent_cache = points[i].parent_node_id;
+            console.log("Parent'e snaplenmez");
+        }
+        
+    }
+
+    for (let k = 0; k < points.length; k++) 
+    {
+        if (points[k].type == "input" && points[k].parent_node_id != point_parent_cache  )
+        {
+            let pos_of_input = document.getElementById(points[k]._id).getBoundingClientRect();
+            console.log(pos_of_input);
+            if ( Math.abs(pos_of_input.left-endx)<range && Math.abs(pos_of_input.top-endy)<range  )
+            {
+                console.log("Yaklaştı");
+                console.log(points);
+                endx = pos_of_input.left+7;
+                endy = pos_of_input.top+7;
+
+                for (let m = 0; m < paths.length; m++) 
+                {
+                    if ( paths[m]._id == newPath.getAttribute("id") )
+                    {
+                        //Snap on
+                        paths[m].target_point_id = points[k]._id;
+                        console.log("snap on");
+                       
+                    }
+                    
+                }
+                break;
+            }
+            else
+            {
+                for (let m = 0; m < paths.length; m++) 
+                {
+                    if ( paths[m]._id == newPath.getAttribute("id") )
+                    {
+                        //Snap off
+                        paths[m].target_point_id = undefined;
+                        break;
+                    }
+                    
+                }
+            }
+        }
+        
+    }
     
 }
 
@@ -178,7 +319,7 @@ function moveStart(e)
         point = e.target; //Hangi outputa tıklandı
         pointdrag = true;
 
-        //Path varmı bak
+        //Path varmı bak, varsa yeni path ekle yoksa path ekle
         //---------------------------------
         //Bu pointi bul
         for (let i = 0; i < points.length; i++) 
@@ -194,9 +335,14 @@ function moveStart(e)
                     if (paths[j].parent_point_id == parent_cache)
                     {
                         //Path eklemeyi kapat
-                        //? ilerde eski pathı silip yeni path ekle 
-                        pointdrag = false;
-                        console.log("Zaten bir path var");
+                        //? ilerde eski pathı silip yeni path ekle
+                        path_to_del = document.getElementById(paths[j]._id);
+                        path_to_del.remove();
+                        paths[j] = new Path("empty", "empty", "empty"); //verileri sil
+                        
+                        
+                        //pointdrag = false;
+                        console.log("Zaten bir path var eskisi silindi");
                     }
                 }
             }
@@ -220,6 +366,7 @@ function moveStart(e)
                     newPath.setAttribute("fill","none");
                     newPath.setAttribute("stroke","black");
                     newPath.setAttribute("stroke-width","3");
+                    newPath.setAttribute("d", "M"+e.x+","+e.y+ " C"+e.x+","+e.y+","+e.x+","+e.y+ " " +e.x+","+e.y );
                     break;
                 }
             }
@@ -247,6 +394,7 @@ function move(e)
         //Bu nodeun pointlerini bul
         for (let i = 0; i < points.length; i++) 
         {
+            //Bu node'un  outputu bul
             if ( points[i].type == "output" && points[i].parent_node_id == node_id )   
             {
                 point_cache =  points[i]._id;
@@ -269,13 +417,46 @@ function move(e)
                         if (curvex<50)
                         { curvex = 50; }
 
+
                         let coords = "M" +startx + "," + starty 
                         +" C"+ (startx+curvex) + "," + starty
                         +","+ (endx-curvex) + "," + endy   
                         +" "+ endx + "," + endy;
 
                         update_path.setAttribute("d",coords);
+                        
+                    }
+                }
+            }
+            //Bu node'un inputu bul
+            else if ( points[i].type == "input" && points[i].parent_node_id == node_id)
+            {
+                 
+                point_cache =  points[i]._id;
 
+                //Bulunan pointe bağlı pathları bul
+                for (let j = 0; j < paths.length; j++) 
+                {   
+                    if ( paths[j].target_point_id == point_cache )
+                    {
+                        let update_path = document.getElementById(paths[j]._id);
+                        let all_points = update_path.getAttribute("d").split(" ");
+
+                        let rect = document.getElementById(point_cache).getBoundingClientRect();
+                        let endx = rect.left+7;
+                        let endy = rect.top+7;
+                        let startx = Number(all_points[0].slice(1,99).split(",")[0]);
+                        let starty = Number(all_points[0].slice(1,99).split(",")[1]);
+                        let curvex = Math.abs( (endx-startx)/2 );
+                        if (curvex<50)
+                        { curvex = 50; }
+
+                        let coords = "M" +startx + "," + starty 
+                        +" C"+ (startx+curvex) + "," + starty
+                        +","+ (endx-curvex) + "," + endy   
+                        +" "+ endx + "," + endy;
+
+                        update_path.setAttribute("d",coords);
                     }
                 }
             }
@@ -290,20 +471,30 @@ function move(e)
         let rect  = point.getBoundingClientRect();
         let startx = rect.left+7;
         let starty = rect.top+7;
-        let endx = e.x;
-        let endy = e.y;
+
+        //End pozisyon i mouse konumu yap
+        endx = e.x;
+        endy = e.y;
+
         let curvex = Math.abs( (endx-startx)/2 );
         if (curvex<50)
             { curvex = 50; }
+            
 
-        coords = "M" +startx + "," + starty 
+
+        //-------------------------------
+        //Snap to Input
+        snap_to_input(parent_cache);
+        
+
+        let coords = "M" +startx + "," + starty 
         +" C"+ (startx+curvex) + "," + starty 
         +","+ (endx-curvex) + "," + endy 
         +" "+ endx + "," + endy;
-
+        
         console.log(coords);
-
         newPath.setAttribute("d",coords);
+
     }
 }
 
