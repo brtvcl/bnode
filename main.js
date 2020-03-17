@@ -26,6 +26,19 @@ document.addEventListener("mousedown", moveStart, false);
     document.getElementById("container").appendChild(svg);   
 }
 
+//--------------------------------------------------
+//Context menu
+function contextMenu(xx, yy)
+{
+    let newContextMenu = document.createElement("div");
+    newContextMenu.setAttribute(
+        "style","width:100px;height:300px;background-color:black;left:"+xx+"px;top:"+yy+"px;position:absolute;"
+        );
+
+    
+    document.getElementById("container").appendChild(newContextMenu);
+}
+
 //Node objesi tanımla
 function Node(_id)
 {
@@ -298,9 +311,10 @@ function snap_to_input(self_id)
 //Mouse down event
 function moveStart(e)
 {
-    //Node sürükle
+    //Node drag start
     if (e.target.classList.contains("nodeheader")) //(sadece headera tıklandıysa hareket ettir)
     {
+
         //Tarayıcının sürüklemeyi engelle
         e = e || window.event;
         e.preventDefault();
@@ -308,11 +322,15 @@ function moveStart(e)
         node=e.target.parentNode ;//Hangi iteme tıklandı id al
         node_id = node.getAttribute("id");
         active = true;//Sürükleme switchi aç
+
+        //Grab konum offset
+        offsetx = (e.x + scrollX - node.offsetLeft);
+        offsety = (e.y + scrollY - node.offsetTop);
         
     }
 
     //Point sürükle || Path oluştur
-    if (e.target.classList.contains("output"))
+    else if (e.target.classList.contains("output"))
     {
         //Tarayıcının sürüklemeyi engelle
         e = e || window.event;
@@ -376,17 +394,28 @@ function moveStart(e)
         }
     }
 
+    //Context menu
+    else
+    {
+        //e.preventDefault();
+        contextMenu(e.x+window.scrollX, e.y+window.scrollY);
+    }
+
+
 
 }
 
+
+//Mouse move event
 function move(e)
 {
     //Node sürükle
     if (active)
     {
-        node.style.left = e.x - (node.offsetWidth/2) + "px";
-        node.style.top = e.y - 16 + "px"; 
 
+        //Node konum update
+        node.style.left = (e.x + scrollX - offsetx) + "px";
+        node.style.top  = (e.y + scrollY - offsety) + "px";
         
         console.log(paths);
         console.log(points);
@@ -500,6 +529,8 @@ function move(e)
     }
 }
 
+
+//Mouse up event
 function moveEnd()
 {
     active = false;
