@@ -7,6 +7,7 @@ let nodes = [];
 let paths = [];
 let points = []; 
 
+
 document.addEventListener("mouseup", moveEnd, false);
 document.addEventListener("mousemove", move, false);
 document.addEventListener("mousedown", moveStart, false);
@@ -46,6 +47,7 @@ function Node(_id)
     var btnId = "nodeSil('"+_id+"')";
     delBtn.setAttribute("onclick",btnId);
     delBtn.setAttribute("class","delBtn");
+    delBtn.setAttribute("id","del"+_id.slice(4,7));
     newNodeHeader.appendChild(delBtn);
 
     //Output point instance
