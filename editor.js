@@ -27,7 +27,6 @@ function removeIndexBox(k)
     indexes[k].i = "empty";
 }
 
-
 function addIndexBox()
 {
     console.log(indexes);
