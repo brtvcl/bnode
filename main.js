@@ -268,12 +268,12 @@ function snap_to_input(self_id)
         {
             let pos_of_input = document.getElementById(points[k]._id).getBoundingClientRect();
             console.log(pos_of_input);
-            if ( Math.abs(pos_of_input.left-endx)<range && Math.abs(pos_of_input.top-endy)<range  )
+            if ( Math.abs(pos_of_input.left+window.scrollX-endx)<range && Math.abs(pos_of_input.top+window.scrollY-endy)<range  )
             {
                 console.log("Yaklaştı");
                 console.log(points);
-                endx = pos_of_input.left+7;
-                endy = pos_of_input.top+7;
+                endx = pos_of_input.left+7+window.scrollX;
+                endy = pos_of_input.top+7+window.scrollY;
 
                 for (let m = 0; m < paths.length; m++) 
                 {
@@ -398,7 +398,7 @@ function moveStart(e)
     else
     {
         //e.preventDefault();
-        contextMenu(e.x+window.scrollX, e.y+window.scrollY);
+        //contextMenu(e.x+window.scrollX, e.y+window.scrollY);
     }
 
 
@@ -440,10 +440,10 @@ function move(e)
                         let all_points = update_path.getAttribute("d").split(" ");
 
                         let rect = document.getElementById(point_cache).getBoundingClientRect();
-                        let startx = rect.left+7;
-                        let starty = rect.top+7;
-                        let endx = all_points[2].split(",")[0];
-                        let endy = all_points[2].split(",")[1];
+                        let startx = rect.left + 7 + window.scrollX;
+                        let starty = rect.top + 7 + window.scrollY;
+                        let endx = parseInt( all_points[2].split(",")[0] );
+                        let endy = parseInt( all_points[2].split(",")[1] );
                         let curvex = Math.abs( (endx-startx)/2 );
                         if (curvex<50)
                         { curvex = 50; }
@@ -474,8 +474,8 @@ function move(e)
                         let all_points = update_path.getAttribute("d").split(" ");
 
                         let rect = document.getElementById(point_cache).getBoundingClientRect();
-                        let endx = rect.left+7;
-                        let endy = rect.top+7;
+                        let endx = rect.left + 7 + window.scrollX;
+                        let endy = rect.top + 7 + window.scrollY;
                         let startx = Number(all_points[0].slice(1,99).split(",")[0]);
                         let starty = Number(all_points[0].slice(1,99).split(",")[1]);
                         let curvex = Math.abs( (endx-startx)/2 );
@@ -500,12 +500,12 @@ function move(e)
     if (pointdrag)
     {
         let rect  = point.getBoundingClientRect();
-        let startx = rect.left+7;
-        let starty = rect.top+7;
+        let startx = rect.left+7 + window.scrollX;
+        let starty = rect.top+7 + window.scrollY;
 
         //End pozisyon i mouse konumu yap
-        endx = e.x;
-        endy = e.y;
+        endx = e.x + window.scrollX;
+        endy = e.y + window.scrollY;
 
         let curvex = Math.abs( (endx-startx)/2 );
         if (curvex<50)
