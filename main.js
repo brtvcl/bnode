@@ -139,7 +139,6 @@ function nodeEkle()
 }
 
 
-
 //-----------------------------------------------------
 //Export script
 function output()
@@ -247,7 +246,6 @@ function snap_to_input(self_id)
 {
     
     //Path'ın çıktığı output self_id oluyor
-
     let range = 40;
 
     //Aynı node'un kendisine bağlanmaması için parenti bul

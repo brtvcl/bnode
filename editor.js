@@ -2,29 +2,61 @@
 
 document.getElementById("addNode").addEventListener("click",addIndexBox);
 
-let indexes = [];
-let indexCount=0;
+let indexes =  [];
+let performs = [];
 
-function Index(_id, parent_node_id, i)
+//---------------------------------------
+//INDEX INPUT START
+//--------------------------------------
+
+//Perform input object
+function Perform(_id, parent_node_id, value)
 {
     this._id = _id;
     this.parent_node_id = parent_node_id;
-    this.i = i;
+    this.value = value;
+    
+    let newPerformInput = document.createElement("select");
+    newPerformInput.setAttribute("id",_id);
+
+    document.getElementById(parent_node_id).appendChild(newPerformInput); 
+
+    let newPerformOption = document.createElement("option");
+    newPerformOption.setAttribute("value","perform1");
+    newPerformOption.innerHTML = "perform1";
+    newPerformInput.appendChild(newPerformOption); 
+
+    newPerformOption = document.createElement("option");
+    newPerformOption.setAttribute("value","perform1");
+    newPerformOption.innerHTML = "perform2";
+    newPerformInput.appendChild(newPerformOption); 
+
+
+}
+
+//--------------------------------------
+//Index input object
+function Index(_id, parent_node_id, value)
+{
+    this._id = _id;
+    this.parent_node_id = parent_node_id;
+    this.value = value;
 
     let newIndexBox = document.createElement("input");
     newIndexBox.setAttribute("type","number");
-    newIndexBox.setAttribute("id",i);
+    newIndexBox.setAttribute("id",_id);
+    newIndexBox.setAttribute("value",value);
     document.getElementById(parent_node_id).appendChild(newIndexBox);    
 
 }
 
 function removeIndexBox(k)
 {
-    console.log( k );
+    console.log("deleted : indexes["+ k+"]" );
     console.log( indexes );
     indexes[k]._id = "empty";
     indexes[k].parent_node_id = "empty";
-    indexes[k].i = "empty";
+    indexes[k].value = "empty";
 }
 
 function addIndexBox()
@@ -48,23 +80,34 @@ function addIndexBox()
                 }
                 else if ( j==indexes.length )
                 {
-                    console.log(nodes[i]._id + " için i input yok, oluşturuluyor");
-                    console.log(nodes[i]._id+ " artık index"+indexCount+ " input'un parenti");
-                    indexes[indexCount] = new Index("index"+indexCount, nodes[i]._id, 0);
+                    
+                    for (let k = 0; k <= indexes.length; k++) 
+                    {
+                        if (indexes[k]==undefined || indexes[k]._id == "empty")
+                        {
+                            console.log("indexes["+k+"] yeni input eklendi");
 
-                    delid = nodes[i]._id.slice(4,8);
-                    delelement = document.getElementById("del"+delid)
-                    console.log(delelement);
-                    currentdelevent = delelement.getAttribute("onclick");
-                    delelement.setAttribute("onclick",currentdelevent+";removeIndexBox("+indexCount+")");
+                            //Yeni index input ekle 
+                            indexes[k] = new Index("index"+k, nodes[i]._id, k);
+                            performs[0] = new Perform("perform0",nodes[i]._id, 0);
+                            
+                            //------------------------------------------------
+                            //Yeni indexi array'dan silmek için event listener ekle
+                            
+                            //Silme butonunu bul
+                            delid = nodes[i]._id.slice(4,8);
+                            delelement = document.getElementById("del"+delid);
 
-                    /*
-                    document.getElementById("del"+delid).addEventListener("click", function() {
-                        removeIndexBox(indexCount); 
-                    });
-                    */
-                    indexCount++;
+                            //Event listener ekle
+                            document.getElementById("del"+delid).addEventListener("click", removeIndexBox.bind(null,k) );
 
+                            break;
+                        }
+                    }
+
+                    //TERMINATE ALL THE LOOPS!!
+                    i=nodes.length+1;
+                    
                     console.log(indexes);
                     break;
                 }
@@ -75,4 +118,8 @@ function addIndexBox()
     }
     
 }
+
+//---------------------------------------
+//INDEX INPUT END
+//---------------------------------------
 
