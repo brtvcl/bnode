@@ -1,23 +1,48 @@
 //Cutscene editor js
 
-document.getElementById("addNode").addEventListener("click",addIndexBox);
+document.getElementById("addNode").addEventListener("click",addDefaultInput);
 
 let indexes =  [];
 let performs = [];
+let speaks = [];
 
 //---------------------------------------
 //INDEX INPUT START
 //--------------------------------------
 
+//Speak input object
+function Speak(_id, parent_node_id, value)
+{
+    //Constructors
+    this._id = "speak"+_id;
+    this.parent_node_id = parent_node_id;
+    this.value = value;
+
+    //DOM Element create
+    let newSpeakInput = document.createElement("input");
+    newSpeakInput.setAttribute("type","text");
+    newSpeakInput.setAttribute("id",this._id);
+
+    //addEventListener so When input entered update value 
+    newSpeakInput.addEventListener("change",function(){
+         speaks[_id].value = newSpeakInput.value; 
+         console.log("value in speaks["+_id+"] updated as '"+speaks[_id].value+"'");
+         console.log(speaks);
+        });
+
+    //Append to parent node
+    document.getElementById(parent_node_id).appendChild(newSpeakInput);
+}
+
 //Perform input object
 function Perform(_id, parent_node_id, value)
 {
-    this._id = _id;
+    this._id = "perform"+_id;
     this.parent_node_id = parent_node_id;
     this.value = value;
     
     let newPerformInput = document.createElement("select");
-    newPerformInput.setAttribute("id",_id);
+    newPerformInput.setAttribute("id",this._id);
 
     document.getElementById(parent_node_id).appendChild(newPerformInput); 
 
@@ -33,79 +58,116 @@ function Perform(_id, parent_node_id, value)
 
 
 }
-
 //--------------------------------------
 //Index input object
 function Index(_id, parent_node_id, value)
 {
-    this._id = _id;
+    //Constructors
+    this._id = "index"+_id;
     this.parent_node_id = parent_node_id;
     this.value = value;
 
-    let newIndexBox = document.createElement("input");
-    newIndexBox.setAttribute("type","number");
-    newIndexBox.setAttribute("id",_id);
-    newIndexBox.setAttribute("value",value);
-    document.getElementById(parent_node_id).appendChild(newIndexBox);    
+    //DOM Element
+    let newIndexInput = document.createElement("input");
+    newIndexInput.setAttribute("type","number");
+    newIndexInput.setAttribute("id",this._id);
+    newIndexInput.setAttribute("value",value);
+
+    //addEventListener so When input entered update value 
+    newIndexInput.addEventListener("change",function(){
+    indexes[_id].value = newIndexInput.value; 
+    console.log("value in indexes["+_id+"] updated as '"+indexes[_id].value+"'");
+    console.log(indexes);
+    });
+    
+    //Appent to node
+    document.getElementById(parent_node_id).appendChild(newIndexInput);    
 
 }
 
-function removeIndexBox(k)
+//Removing the default inputs
+//!!!!Add removal of event listener in future
+function removeDefaultInput(i)
 {
-    console.log("deleted : indexes["+ k+"]" );
+    console.log("deleted : indexes["+ i+"]" );
     console.log( indexes );
-    indexes[k]._id = "empty";
-    indexes[k].parent_node_id = "empty";
-    indexes[k].value = "empty";
+    
+    indexes[i]._id            = "empty";
+    indexes[i].parent_node_id = "empty";
+    indexes[i].value          = "empty";
+    
+    speaks[i]._id             = "empty";
+    speaks[i].parent_node_id  = "empty";
+    speaks[i].value           = "empty";       
+
 }
 
-function addIndexBox()
+//Adding the default inputs and appending it to node
+function addDefaultInput()
 {
+    /*This function searches all the 
+    nodes and finds the new added one to the workspace
+    And adds the default inputs to the node*/
+
     console.log(indexes);
     console.log("Yeni i inputu ekleniyor..");
 
+    //Search in all nodes
     for (let i = 0; i <= nodes.length; i++) 
     {
+        //Skip the undefined or "empty" (deleted) nodes
         if (nodes[i]!=undefined && nodes[i]._id != "empty")
         {
-            console.log(nodes[i]._id+" node una bağlı inputlar kontrol ediliyor....");
-
+            console.log("Checking if this "+nodes[i]._id+" has any inputs");
+            //Search in all index inputs
             for (let j = 0; j <= indexes.length; j++) 
             {
-                
+                /*Check if index input is available (not "empty" or undefined), 
+                and check if this input's parent is the node that we are searching for
+                IF YES that means that means this node isn't the one we are looking for
+                (we are looking for a node that has no input so we can add the input)
+                IF NOT and also if we checked all the indexes this means 
+                we found the node that has no index input 
+                */
+
+                //Checking if this indexes parent is the node we are in
                 if ( (indexes[j] != undefined && indexes[j]._id != "empty" ) && indexes[j].parent_node_id == nodes[i]._id)
                 {
-                    console.log(nodes[i]._id +" "+ indexes[j]._id+" ile bağlı");
+                    console.log(nodes[i]._id +" and "+ indexes[j]._id+" is connected");
                     break;
                 }
+                //IF NOT, check if we checked all the index inputs
                 else if ( j==indexes.length )
                 {
-                    
+                    /*Search in all indexes, so we can 
+                    insert the new one if theres an "empty" one
+                    other just add new one
+                    */
                     for (let k = 0; k <= indexes.length; k++) 
                     {
+                        //If found "empty" or undefined(new slot) add the inputs there
                         if (indexes[k]==undefined || indexes[k]._id == "empty")
                         {
-                            console.log("indexes["+k+"] yeni input eklendi");
-
-                            //Yeni index input ekle 
-                            indexes[k] = new Index("index"+k, nodes[i]._id, k);
-                            performs[0] = new Perform("perform0",nodes[i]._id, 0);
+                            //Default inputları oluştur 
+                            indexes[k] = new Index(k, nodes[i]._id, k);
+                            speaks[k] = new Speak(k,nodes[i]._id, "");
+                            performs[k] = new Perform(k,nodes[i]._id, 0);
                             
                             //------------------------------------------------
-                            //Yeni indexi array'dan silmek için event listener ekle
-                            
                             //Silme butonunu bul
                             delid = nodes[i]._id.slice(4,8);
                             delelement = document.getElementById("del"+delid);
-
-                            //Event listener ekle
-                            document.getElementById("del"+delid).addEventListener("click", removeIndexBox.bind(null,k) );
+                            //Veriyi silmek için delete butonuna Event listener ekle
+                            document.getElementById("del"+delid).addEventListener("click", removeDefaultInput.bind(null,k) );
 
                             break;
                         }
                     }
 
                     //TERMINATE ALL THE LOOPS!!
+                    /*This sets the variable 
+                    of the first loop to out of range
+                    so all the loops STOPS  */
                     i=nodes.length+1;
                     
                     console.log(indexes);
