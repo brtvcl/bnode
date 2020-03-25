@@ -102,6 +102,16 @@ function removeDefaultInput(i)
 
 }
 
+//Function of the "add perform script" button
+//Adds the new perform input
+//Removes the button
+function addPerformInput(k, parent_node_id, value, button_id)
+{
+    performs[k] = new Perform(k, parent_node_id, value);
+
+    document.getElementById(button_id).remove();
+}
+
 //Adding the default inputs and appending it to node
 function addDefaultInput()
 {
@@ -148,11 +158,19 @@ function addDefaultInput()
                         //If found "empty" or undefined(new slot) add the inputs there
                         if (indexes[k]==undefined || indexes[k]._id == "empty")
                         {
-                            //Default inputları oluştur 
+                            //Create default inputs
                             indexes[k] = new Index(k, nodes[i]._id, k);
                             speaks[k] = new Speak(k,nodes[i]._id, "");
-                            performs[k] = new Perform(k,nodes[i]._id, 0);
+
+
+                            //Perform Script add button
+                            let prfbtn = document.createElement("button");
+                            prfbtn.setAttribute("id","prfbtn"+k);
+                            prfbtn.innerHTML = "+";
+                            prfbtn.addEventListener("click", addPerformInput.bind(null, k, nodes[i]._id, 0, "prfbtn"+k));
+                            document.getElementById(nodes[i]._id).appendChild(prfbtn);
                             
+
                             //------------------------------------------------
                             //Silme butonunu bul
                             delid = nodes[i]._id.slice(4,8);
