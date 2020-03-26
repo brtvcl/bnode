@@ -91,6 +91,8 @@ function removeDefaultInput(i)
 {
     console.log("deleted : indexes["+ i+"]" );
     console.log( indexes );
+    console.log( speaks );
+    console.log( performs );  
     
     indexes[i]._id            = "empty";
     indexes[i].parent_node_id = "empty";
@@ -98,18 +100,61 @@ function removeDefaultInput(i)
     
     speaks[i]._id             = "empty";
     speaks[i].parent_node_id  = "empty";
-    speaks[i].value           = "empty";       
+    speaks[i].value           = "empty";   
+    
+    performs[i]._id           = "empty";
+    performs[i].parent_node_id= "empty";
+    performs[i].value         = "empty";
+    
 
+}
+
+//Perform Script add button
+//Adds a button element
+//When clicked the added button, it creates the perform input and creates "delete button" of perform input
+function add_perform_button(parent_node_index, perform_index)
+{
+    let perform_add_btn = document.createElement("button");
+    let id_name = "perform_add_btn";
+    perform_add_btn.setAttribute("id",id_name+perform_index);
+    perform_add_btn.innerHTML = "+";
+    perform_add_btn.addEventListener("click", addPerformInput.bind(null, parent_node_index, perform_index));
+    document.getElementById(nodes[parent_node_index]._id).appendChild(perform_add_btn);
+
+}
+
+//Deletes the perform input element and delets data in the performs[] array 
+function del_perform_input(parent_node_index, perform_index)
+{
+    document.getElementById("prf_del_btn"+perform_index).remove();
+    document.getElementById("perform"+perform_index).remove();
+
+    performs[perform_index]._id = "empty";
+    performs[perform_index].parent_node_id = "empty";
+    performs[perform_index].value = "empty";
+
+    add_perform_button(parent_node_index,perform_index);
 }
 
 //Function of the "add perform script" button
 //Adds the new perform input
 //Removes the button
-function addPerformInput(k, parent_node_id, value, button_id)
+function addPerformInput(parent_node_index, perform_index)
 {
-    performs[k] = new Perform(k, parent_node_id, value);
+    let parent_node_id = nodes[parent_node_index]._id;
 
-    document.getElementById(button_id).remove();
+    performs[perform_index] = new Perform(perform_index, parent_node_id, 0);
+
+    //Perform Script del button
+    let prf_del_btn = document.createElement("button");
+    prf_del_btn.setAttribute("id","prf_del_btn"+perform_index);
+    prf_del_btn.innerHTML = "X";
+    prf_del_btn.addEventListener("click", del_perform_input.bind(null, parent_node_index, perform_index));
+    document.getElementById(parent_node_id).appendChild(prf_del_btn);
+
+    //Ekle butonunu sil
+    document.getElementById("perform_add_btn"+perform_index).remove();
+
 }
 
 //Adding the default inputs and appending it to node
@@ -162,15 +207,8 @@ function addDefaultInput()
                             indexes[k] = new Index(k, nodes[i]._id, k);
                             speaks[k] = new Speak(k,nodes[i]._id, "");
 
-
-                            //Perform Script add button
-                            let prfbtn = document.createElement("button");
-                            prfbtn.setAttribute("id","prfbtn"+k);
-                            prfbtn.innerHTML = "+";
-                            prfbtn.addEventListener("click", addPerformInput.bind(null, k, nodes[i]._id, 0, "prfbtn"+k));
-                            document.getElementById(nodes[i]._id).appendChild(prfbtn);
+                            add_perform_button(k,i);
                             
-
                             //------------------------------------------------
                             //Silme butonunu bul
                             delid = nodes[i]._id.slice(4,8);
