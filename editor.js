@@ -4,7 +4,9 @@ document.getElementById("addNode").addEventListener("click",addDefaultInput);
 
 let indexes =  [];
 let performs = [];
+let args = [];
 let speaks = [];
+
 
 //---------------------------------------
 //INDEX INPUT START
@@ -54,8 +56,35 @@ function Perform(_id, parent_node_id, value)
     newPerformOption = document.createElement("option");
     newPerformOption.setAttribute("value","perform1");
     newPerformOption.innerHTML = "perform2";
-    newPerformInput.appendChild(newPerformOption); 
+    newPerformInput.appendChild(newPerformOption);
+    
+    args[0] = new Arg(_id, this._id, parent_node_id, 0, "obj_player");
 
+
+}
+
+function Arg(_id,parent_perform_id,parent_node_id,arg_number,value)
+{
+    this._id = "argument"+_id;
+    this.parent_perform_id = parent_perform_id;
+    this.arg_number = arg_number;
+    this.value = value;
+
+    //DOM Element Create
+    let new_arg_input = document.createElement("input");
+    new_arg_input.setAttribute("type","text");
+    new_arg_input.setAttribute("id",this._id);
+    new_arg_input.setAttribute("value",this.value);
+
+    //Add event listener to update value in array
+    new_arg_input.addEventListener("change",function(){
+        args[_id].value = new_arg_input.value; 
+        console.log("value in args["+_id+"] updated as '"+args[_id].value+"'");
+        console.log(args);
+       });
+
+    //Append to parent node
+    document.getElementById(parent_node_id).appendChild(new_arg_input);
 
 }
 //--------------------------------------
