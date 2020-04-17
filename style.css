@@ -93,3 +93,10 @@
 {
     cursor:grabbing;
 }
+
+.answer 
+{
+    background-color: tomato;
+    margin-top: 10px;
+    padding-top:5px;
+}

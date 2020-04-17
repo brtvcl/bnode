@@ -6,6 +6,7 @@ let indexes =  [];
 let performs = [];
 let args = [];
 let speaks = [];
+let answers = [];
 
 
 //---------------------------------------
@@ -58,15 +59,28 @@ function Perform(_id, parent_node_id, value)
     newPerformOption.innerHTML = "perform2";
     newPerformInput.appendChild(newPerformOption);
     
-    args[0] = new Arg(_id, this._id, parent_node_id, 0, "obj_player");
+    
+    for (let repeat = 0; repeat < 5; repeat++) 
+    {
+        for (let i = 0; i <= args.length; i++) 
+        {
+            if (args[i]==undefined || args[i]._id == "empty")
+            {
+                args[i] = new Arg(i, _id, parent_node_id, repeat, "");
+                break;
+            }
+        }    
+    }  
+    
+    console.log(args);
 
 
 }
 
-function Arg(_id,parent_perform_id,parent_node_id,arg_number,value)
+function Arg(_id,parent_perform_index,parent_node_id,arg_number,value)
 {
     this._id = "argument"+_id;
-    this.parent_perform_id = parent_perform_id;
+    this.parent_perform_index = parent_perform_index;
     this.arg_number = arg_number;
     this.value = value;
 
@@ -114,6 +128,44 @@ function Index(_id, parent_node_id, value)
 
 }
 
+function Answer(_id,parent_node_id)
+{
+    ///Constructors
+    this._id = "answer"+_id;
+    this.parent_node_id = parent_node_id;
+
+    //DOM Element create
+    let newAnswerInput = document.createElement("div");
+    newAnswerInput.setAttribute("class","answer");
+    newAnswerInput.setAttribute("id",this._id);
+
+    //Appent to parent node
+    document.getElementById(parent_node_id).appendChild(newAnswerInput);
+    newAnswerInput.appendChild(document.createElement("hr"));
+
+
+    //Text
+    /*
+    let count = 0;
+    for (let i = 0; i < answers.length; i++) 
+    {
+        if (answers[i].parent_node_id == parent_node_id)
+        {count++;}
+        
+    }
+    */
+
+    for (let i = 0; i <= speaks.length; i++) 
+    {
+        if (speaks[i]==undefined || speaks[i]._id=="empty")
+        {
+            speaks[i] = new Speak(i, this._id, "");
+            break;
+        }   
+    }
+    
+
+}
 //Removing the default inputs
 //!!!!Add removal of event listener in future
 function removeDefaultInput(i)
@@ -155,12 +207,25 @@ function add_perform_button(parent_node_index, perform_index)
 //Deletes the perform input element and delets data in the performs[] array 
 function del_perform_input(parent_node_index, perform_index)
 {
+    for (let i = 0; i <= args.length; i++) 
+    {
+        if ( args[i]!=undefined && args[i]!="empty" && args[i].parent_perform_index==perform_index)
+        {
+            document.getElementById(args[i]._id).remove();
+            args[i]._id = "empty";
+            args[i].parent_perform_index = "empty";
+            args[i].arg_number = "empty";
+            args[i].value = "empty";
+        }
+    }
+
     document.getElementById("prf_del_btn"+perform_index).remove();
     document.getElementById("perform"+perform_index).remove();
 
     performs[perform_index]._id = "empty";
     performs[perform_index].parent_node_id = "empty";
     performs[perform_index].value = "empty";
+
 
     add_perform_button(parent_node_index,perform_index);
 }
@@ -183,6 +248,85 @@ function addPerformInput(parent_node_index, perform_index)
 
     //Ekle butonunu sil
     document.getElementById("perform_add_btn"+perform_index).remove();
+
+    console.log(performs);
+
+}
+
+//Add answer button
+function add_answer_button(parent_node_index, answer_index)
+{
+    let answer_add_btn = document.createElement("button");
+    let id_name = "answer_add_btn"
+    answer_add_btn.innerHTML = "answer add";
+    answer_add_btn.setAttribute("id",id_name+answer_index);
+    answer_add_btn.addEventListener("click",add_answer_input.bind(null, parent_node_index,answer_index));
+    document.getElementById(nodes[parent_node_index]._id).appendChild(answer_add_btn);
+}
+
+function del_answer_input(parent_node_index, answer_index)
+{
+
+    //Remove array list here!!
+    
+    answers[answer_index].parent_node_id = "empty";
+    answers[answer_index]._id = "empty";
+    console.log(answers);
+
+    //Remove answer elements
+    document.getElementById("answer"+answer_index).remove();
+
+    //Add add button
+    add_answer_button(parent_node_index,answer_index);
+
+    //Remove delete button
+    document.getElementById("answ_del_btn"+answer_index).remove();
+    
+    //Remove add another button
+    let remove_next_button = document.getElementById("answer_add_btn"+(answer_index+1));
+    console.log(remove_next_button);
+    
+    if (remove_next_button!=null)
+    {
+        remove_next_button.remove();
+    }
+}
+
+function add_answer_input(parent_node_index, answer_index)
+{
+    
+    let parent_node_id = nodes[parent_node_index]._id;
+    
+    console.log(answers);
+    for (let m = 0; m <= answers.length; m++)
+    {
+        if (answers[m]==undefined || answers[m]._id=="empty")
+        {
+            answers[m] = new Answer(m,parent_node_id);
+            break;
+        }
+    }
+    console.log(answers);
+    //Add delete button
+    let answ_del_btn = document.createElement("button");
+    answ_del_btn.innerHTML = "X";
+    answ_del_btn.setAttribute("id","answ_del_btn"+answer_index);
+    answ_del_btn.addEventListener("click",del_answer_input.bind(null,parent_node_index,answer_index));
+    document.getElementById(parent_node_id).appendChild(answ_del_btn);
+
+    //Remove this add button
+    document.getElementById("answer_add_btn"+answer_index).remove();
+
+    //Add another add button
+    let count = 0;
+    for (let i = 0; i <= answers.length; i++) 
+    {
+        if (answers[i]!=undefined && answers[i].parent_node_id == parent_node_id)
+        {count++;}
+        
+    }
+    if (count<4)
+    {add_answer_button(parent_node_index,answer_index+1);}
 
 }
 
@@ -235,6 +379,16 @@ function addDefaultInput()
                             //Create default inputs
                             indexes[k] = new Index(k, nodes[i]._id, k);
                             speaks[k] = new Speak(k,nodes[i]._id, "");
+
+                            console.log(answers);
+                            //Add answer and perform buttons
+                            for (let m = 0; m <= answers.length; m++)
+                            {
+                                if (answers[m]==undefined || answers[m]._id=="empty")
+                                {
+                                    add_answer_button(k,m);
+                                }
+                            }
 
                             add_perform_button(k,i);
                             
