@@ -259,9 +259,10 @@ function add_answer_button(parent_node_index, answer_index)
     let answer_add_btn = document.createElement("button");
     let id_name = "answer_add_btn"
     answer_add_btn.innerHTML = "answer add";
-    answer_add_btn.setAttribute("id",id_name+answer_index);
+    answer_add_btn.setAttribute("id",id_name+parent_node_index);
     answer_add_btn.addEventListener("click",add_answer_input.bind(null, parent_node_index,answer_index));
     document.getElementById(nodes[parent_node_index]._id).appendChild(answer_add_btn);
+    console.log(answer_index);
 }
 
 function del_answer_input(parent_node_index, answer_index)
@@ -277,12 +278,15 @@ function del_answer_input(parent_node_index, answer_index)
     document.getElementById("answer"+answer_index).remove();
 
     //Add add button
+    /*
     add_answer_button(parent_node_index,answer_index);
+    */
 
     //Remove delete button
     document.getElementById("answ_del_btn"+answer_index).remove();
     
     //Remove add another button
+    /*
     let remove_next_button = document.getElementById("answer_add_btn"+(answer_index+1));
     console.log(remove_next_button);
     
@@ -290,6 +294,7 @@ function del_answer_input(parent_node_index, answer_index)
     {
         remove_next_button.remove();
     }
+    */
 }
 
 function add_answer_input(parent_node_index, answer_index)
@@ -297,27 +302,9 @@ function add_answer_input(parent_node_index, answer_index)
     
     let parent_node_id = nodes[parent_node_index]._id;
     
-    console.log(answers);
-    for (let m = 0; m <= answers.length; m++)
-    {
-        if (answers[m]==undefined || answers[m]._id=="empty")
-        {
-            answers[m] = new Answer(m,parent_node_id);
-            break;
-        }
-    }
-    console.log(answers);
-    //Add delete button
-    let answ_del_btn = document.createElement("button");
-    answ_del_btn.innerHTML = "X";
-    answ_del_btn.setAttribute("id","answ_del_btn"+answer_index);
-    answ_del_btn.addEventListener("click",del_answer_input.bind(null,parent_node_index,answer_index));
-    document.getElementById(parent_node_id).appendChild(answ_del_btn);
-
-    //Remove this add button
-    document.getElementById("answer_add_btn"+answer_index).remove();
-
-    //Add another add button
+    
+    
+    //Check how many answers this parent_node has
     let count = 0;
     for (let i = 0; i <= answers.length; i++) 
     {
@@ -325,9 +312,33 @@ function add_answer_input(parent_node_index, answer_index)
         {count++;}
         
     }
-    if (count<4)
-    {add_answer_button(parent_node_index,answer_index+1);}
 
+    //If less than 4 add new answer
+    if (count<4)
+    {
+        console.log(answers);
+        for (let m = 0; m <= answers.length; m++)
+        {
+            if (answers[m]==undefined || answers[m]._id=="empty")
+            {
+                answers[m] = new Answer(m,parent_node_id);
+                answer_index = m;
+                break;
+            }
+        }
+
+            
+        //Add delete button
+        let answ_del_btn = document.createElement("button");
+        answ_del_btn.innerHTML = "X";
+        answ_del_btn.setAttribute("id","answ_del_btn"+answer_index);
+        answ_del_btn.addEventListener("click",del_answer_input.bind(null,parent_node_index,answer_index));
+        document.getElementById(parent_node_id).appendChild(answ_del_btn);
+
+    }
+
+    
+    
 }
 
 //Adding the default inputs and appending it to node
@@ -380,16 +391,9 @@ function addDefaultInput()
                             indexes[k] = new Index(k, nodes[i]._id, k);
                             speaks[k] = new Speak(k,nodes[i]._id, "");
 
+                            
                             console.log(answers);
-                            //Add answer and perform buttons
-                            for (let m = 0; m <= answers.length; m++)
-                            {
-                                if (answers[m]==undefined || answers[m]._id=="empty")
-                                {
-                                    add_answer_button(k,m);
-                                }
-                            }
-
+                            add_answer_button(k,i);
                             add_perform_button(k,i);
                             
                             //------------------------------------------------
