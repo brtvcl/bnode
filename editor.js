@@ -193,152 +193,193 @@ function removeDefaultInput(i)
 //Perform Script add button
 //Adds a button element
 //When clicked the added button, it creates the perform input and creates "delete button" of perform input
-function add_perform_button(parent_node_index, perform_index)
-{
-    let perform_add_btn = document.createElement("button");
-    let id_name = "perform_add_btn";
-    perform_add_btn.setAttribute("id",id_name+perform_index);
-    perform_add_btn.innerHTML = "+";
-    perform_add_btn.addEventListener("click", addPerformInput.bind(null, parent_node_index, perform_index));
-    document.getElementById(nodes[parent_node_index]._id).appendChild(perform_add_btn);
 
-}
 
-//Deletes the perform input element and delets data in the performs[] array 
-function del_perform_input(parent_node_index, perform_index)
+//-----------
+//PERFORM ELEMENT
 {
-    for (let i = 0; i <= args.length; i++) 
+    function add_perform_button(parent_id)
     {
-        if ( args[i]!=undefined && args[i]!="empty" && args[i].parent_perform_index==perform_index)
-        {
-            document.getElementById(args[i]._id).remove();
-            args[i]._id = "empty";
-            args[i].parent_perform_index = "empty";
-            args[i].arg_number = "empty";
-            args[i].value = "empty";
+        //Create button
+        let perform_add_btn = document.createElement("button");
+        perform_add_btn.innerHTML = "+";
+        
+        //Set unique id for button
+        let id_name = "perform_add_btn";
+        let btn_index = 0;
+        //Check how many buttons present on DOM
+        while (!!document.getElementById("perform_add_btn"+btn_index)) {
+            btn_index++;
         }
-    }
+        perform_add_btn.setAttribute("id",id_name+btn_index);
+        
+        //Append button to DOM
+        document.getElementById(parent_id).appendChild(perform_add_btn);
 
-    document.getElementById("prf_del_btn"+perform_index).remove();
-    document.getElementById("perform"+perform_index).remove();
-
-    performs[perform_index]._id = "empty";
-    performs[perform_index].parent_node_id = "empty";
-    performs[perform_index].value = "empty";
-
-
-    add_perform_button(parent_node_index,perform_index);
-}
-
-//Function of the "add perform script" button
-//Adds the new perform input
-//Removes the button
-function addPerformInput(parent_node_index, perform_index)
-{
-    let parent_node_id = nodes[parent_node_index]._id;
-
-    performs[perform_index] = new Perform(perform_index, parent_node_id, 0);
-
-    //Perform Script del button
-    let prf_del_btn = document.createElement("button");
-    prf_del_btn.setAttribute("id","prf_del_btn"+perform_index);
-    prf_del_btn.innerHTML = "X";
-    prf_del_btn.addEventListener("click", del_perform_input.bind(null, parent_node_index, perform_index));
-    document.getElementById(parent_node_id).appendChild(prf_del_btn);
-
-    //Ekle butonunu sil
-    document.getElementById("perform_add_btn"+perform_index).remove();
-
-    console.log(performs);
-
-}
-
-//Add answer button
-function add_answer_button(parent_node_index, answer_index)
-{
-    let answer_add_btn = document.createElement("button");
-    let id_name = "answer_add_btn"
-    answer_add_btn.innerHTML = "answer add";
-    answer_add_btn.setAttribute("id",id_name+parent_node_index);
-    answer_add_btn.addEventListener("click",add_answer_input.bind(null, parent_node_index,answer_index));
-    document.getElementById(nodes[parent_node_index]._id).appendChild(answer_add_btn);
-    console.log(answer_index);
-}
-
-function del_answer_input(parent_node_index, answer_index)
-{
-
-    //Remove array list here!!
-    
-    answers[answer_index].parent_node_id = "empty";
-    answers[answer_index]._id = "empty";
-    console.log(answers);
-
-    //Remove answer elements
-    document.getElementById("answer"+answer_index).remove();
-
-    //Add add button
-    /*
-    add_answer_button(parent_node_index,answer_index);
-    */
-
-    //Remove delete button
-    document.getElementById("answ_del_btn"+answer_index).remove();
-    
-    //Remove add another button
-    /*
-    let remove_next_button = document.getElementById("answer_add_btn"+(answer_index+1));
-    console.log(remove_next_button);
-    
-    if (remove_next_button!=null)
-    {
-        remove_next_button.remove();
-    }
-    */
-}
-
-function add_answer_input(parent_node_index, answer_index)
-{
-    
-    let parent_node_id = nodes[parent_node_index]._id;
-    
-    
-    
-    //Check how many answers this parent_node has
-    let count = 0;
-    for (let i = 0; i <= answers.length; i++) 
-    {
-        if (answers[i]!=undefined && answers[i].parent_node_id == parent_node_id)
-        {count++;}
+        //Add EventListener
+        perform_add_btn.addEventListener("click", add_perform_input.bind(null, parent_id, id_name+btn_index));
         
     }
-
-    //If less than 4 add new answer
-    if (count<4)
+    //Function of the "add perform script" button
+    //Adds the new perform input
+    //Removes the button
+    function add_perform_input(parent_id, button_id)
     {
-        console.log(answers);
-        for (let m = 0; m <= answers.length; m++)
-        {
-            if (answers[m]==undefined || answers[m]._id=="empty")
+        let perform_index = 0;
+
+        //Add perform to empty array index
+        while (perform_index <= performs.length) {
+            if ( performs[perform_index]==undefined || performs[perform_index]._id == "empty") 
             {
-                answers[m] = new Answer(m,parent_node_id);
-                answer_index = m;
+                performs[perform_index] = new Perform(perform_index,parent_id,0);
                 break;
+            }
+            perform_index++;
+        }
+
+
+        //Perform Script del button
+        let prf_del_btn = document.createElement("button");
+        prf_del_btn.setAttribute("id","prf_del_btn"+perform_index);
+        prf_del_btn.innerHTML = "X";
+        prf_del_btn.addEventListener("click", del_perform_input.bind(null, parent_id, perform_index));
+        document.getElementById(parent_id).appendChild(prf_del_btn);
+
+        //Remvoe "add '+' " button
+        document.getElementById(button_id).remove();
+
+        console.log(performs);
+
+    }
+
+    //Deletes the perform input element and delets data in the performs[] array 
+    function del_perform_input(parent_id, perform_index)
+    {
+        console.log(perform_index);
+        for (let i = 0; i <= args.length; i++) 
+        {
+            if ( args[i]!=undefined && args[i]!="empty" && args[i].parent_perform_index==perform_index)
+            {
+                document.getElementById(args[i]._id).remove();
+                args[i]._id = "empty";
+                args[i].parent_perform_index = "empty";
+                args[i].arg_number = "empty";
+                args[i].value = "empty";
             }
         }
 
-            
-        //Add delete button
-        let answ_del_btn = document.createElement("button");
-        answ_del_btn.innerHTML = "X";
-        answ_del_btn.setAttribute("id","answ_del_btn"+answer_index);
-        answ_del_btn.addEventListener("click",del_answer_input.bind(null,parent_node_index,answer_index));
-        document.getElementById(parent_node_id).appendChild(answ_del_btn);
+        document.getElementById("prf_del_btn"+perform_index).remove();
+        document.getElementById("perform"+perform_index).remove();
 
+        performs[perform_index]._id = "empty";
+        performs[perform_index].parent_node_id = "empty";
+        performs[perform_index].value = "empty";
+
+
+        add_perform_button(parent_id);
+        console.log(performs);
+        console.log(args);
+    }
+}
+
+
+//--------------
+//ANSWER ELEMENT
+{
+
+    //Add answer button
+    function add_answer_button(parent_id)
+    {
+        //Create button
+        let answer_add_btn = document.createElement("button");
+        answer_add_btn.innerHTML = "answer add";
+        
+        //Set id for button 
+        let id_name = "answer_add_btn";
+        let btn_index=0;
+        //Check how many buttons present on DOM
+        while (!!document.getElementById("answer_add_btn"+btn_index)) {
+            btn_index++;
+        }
+        answer_add_btn.setAttribute("id",id_name+btn_index);
+
+        //Append button to DOM
+        document.getElementById(parent_id).appendChild(answer_add_btn);
+        
+        //Add event listener
+        answer_add_btn.addEventListener("click",add_answer_input.bind(null, parent_id, id_name+btn_index));
+        
+        
     }
 
+    function add_answer_input(parent_id, button_id)
+    {
     
-    
+        //Remove add button that called this function 
+        //document.getElementById(button_id).remove();
+
+        //let parent_node_id = nodes[parent_node_index]._id;
+        
+        //Check how many answers this parent_node has
+        let count = 0;
+        for (let i = 0; i <= answers.length; i++) 
+        {
+            if (answers[i]!=undefined && answers[i].parent_node_id == parent_id)
+            {count++;}
+            
+        }
+        //If less than 4 add new answer
+        if (count<4)
+        {
+            let answer_index = 0;
+            while (answer_index <= answers.length) {
+                if (answers[answer_index]==undefined || answers[answer_index]._id=="empty")
+                {
+                    answers[answer_index] = new Answer(answer_index,parent_id);
+                    
+                    //Add answer perform button
+                    add_perform_button("answer"+answer_index);
+                    
+                    break;
+                }
+                answer_index++;
+            }
+
+            //Add delete button
+            let answ_del_btn = document.createElement("button");
+            answ_del_btn.innerHTML = "X";
+            answ_del_btn.setAttribute("id","answ_del_btn"+answer_index);
+            answ_del_btn.addEventListener("click",del_answer_input.bind(null,parent_id,answer_index));
+            document.getElementById(parent_id).appendChild(answ_del_btn);
+            
+        }
+
+        
+        
+    }
+
+    function del_answer_input(parent_id, answer_index)
+    {
+
+        //Remove array list here!!
+        
+        answers[answer_index].parent_node_id = "empty";
+        answers[answer_index]._id = "empty";
+        console.log(answers);
+
+        //Remove answer elements
+        document.getElementById("answer"+answer_index).remove();
+
+        //Add add button
+        /*
+        add_answer_button(parent_node_index,answer_index);
+        */
+
+        //Remove delete button
+        document.getElementById("answ_del_btn"+answer_index).remove();
+        
+    }
+
 }
 
 //Adding the default inputs and appending it to node
@@ -391,10 +432,9 @@ function addDefaultInput()
                             indexes[k] = new Index(k, nodes[i]._id, k);
                             speaks[k] = new Speak(k,nodes[i]._id, "");
 
-                            
                             console.log(answers);
-                            add_answer_button(k,i);
-                            add_perform_button(k,i);
+                            add_answer_button(nodes[i]._id);
+                            add_perform_button(nodes[i]._id);
                             
                             //------------------------------------------------
                             //Silme butonunu bul
