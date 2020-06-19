@@ -3,8 +3,8 @@ var active =  false;
 var pointdrag = false;
 
 //arraylar
-let nodes = []; 
-let paths = [];
+let nodes  = []; 
+let paths  = [];
 let points = []; 
 
 
@@ -22,7 +22,8 @@ document.addEventListener("mousedown", moveStart, false);
     svg.style.position = "absolute";
     svg.style.top=0;
     svg.style.left=0;
-    svg.style.zIndex=-1;
+    svg.style.zIndex=1;
+    svg.style.pointerEvents="none";
     document.getElementById("container").appendChild(svg);   
 }
 
@@ -65,40 +66,12 @@ function Node(_id)
 
     //Output point instance
     //empty indise yada yeni indise point ekle
-    for (let i = 0; i <= points.length; i++) 
-    {
-        if (points[i] == undefined || points[i]._id == "empty") 
-        {
-            points[i] = new Point("point" + i, "output", _id);
-            console.log(i+ ". indise yeni output point obje koyuldu");
-
-            //Output point element
-            let opoint = document.createElement("div");
-            opoint.setAttribute("class","connection output");
-            opoint.setAttribute("id","point" + i );
-            newNode.appendChild(opoint);
-            break;
-        }
-
-    }
+    let opoint = add_point("output",_id);
+    newNode.appendChild(opoint);
 
     //Input point instance
-    for (let i = 0; i <= points.length; i++) 
-    {
-        if ( points[i] == undefined || points[i]._id == "empty") 
-        {
-            points[i] = new Point("point" + i, "input", _id);
-            console.log(i+ ". indise yeni input point obje koyuldu");
-
-            //Output point element
-            let opoint = document.createElement("div");
-            opoint.setAttribute("class","connection input");
-            opoint.setAttribute("id","point" + i );
-            newNode.appendChild(opoint);
-            break;
-        }
-
-    }
+    let ipoint = add_point("input",_id);
+    newNode.appendChild(ipoint);
 
 
 }
@@ -119,7 +92,24 @@ function Point(_id, type, parent_node_id)
     this.parent_node_id = parent_node_id;
 }
 
+function add_point(type,parent_node_id)
+{
+    for (let i = 0; i <= points.length; i++) 
+    {
+        if (points[i] == undefined || points[i]._id == "empty") 
+        {
+            points[i] = new Point("point" + i, type, parent_node_id);
 
+            //Output point element
+            let opoint = document.createElement("div");
+            opoint.setAttribute("class","connection "+type);
+            opoint.setAttribute("id","point" + i );
+            return opoint;
+            break;
+        }
+
+    }
+}
 
 //---------------------------------------------------
 //Node ekle
@@ -309,6 +299,8 @@ function snap_to_input(self_id)
 //Mouse down event
 function moveStart(e)
 {
+
+    
     //Node drag start
     if (e.target.classList.contains("nodeheader")) //(sadece headera tıklandıysa hareket ettir)
     {
@@ -382,8 +374,9 @@ function moveStart(e)
                     newPath.setAttribute("id","path" + i);
                     svg.appendChild(newPath);
                     newPath.setAttribute("fill","none");
-                    newPath.setAttribute("stroke","black");
+                    newPath.setAttribute("stroke","gray");
                     newPath.setAttribute("stroke-width","3");
+                    newPath.zIndex = -999;
                     newPath.setAttribute("d", "M"+e.x+","+e.y+ " C"+e.x+","+e.y+","+e.x+","+e.y+ " " +e.x+","+e.y );
                     break;
                 }
@@ -407,6 +400,7 @@ function moveStart(e)
 //Mouse move event
 function move(e)
 {
+    editor_move();
     //Node sürükle
     if (active)
     {

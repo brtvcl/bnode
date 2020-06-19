@@ -2,11 +2,11 @@
 
 document.getElementById("addNode").addEventListener("click",addDefaultInput);
 
-let indexes =  [];
+let indexes  = [];
 let performs = [];
-let args = [];
-let speaks = [];
-let answers = [];
+let args     = [];
+let speaks   = [];
+let answers  = [];
 
 
 //---------------------------------------
@@ -345,6 +345,12 @@ function removeDefaultInput(i)
                 answer_index++;
             }
 
+            //Add answer output
+            let apoint = add_point("output","answer"+answer_index);
+            document.getElementById("answer"+answer_index).appendChild(apoint);
+            console.log(points);
+
+
             //Add delete button
             let answ_del_btn = document.createElement("button");
             answ_del_btn.innerHTML = "X";
@@ -462,6 +468,62 @@ function addDefaultInput()
         
     }
     
+}
+function editor_move()
+{
+    if (active)
+    {
+
+        //Check if parent of the answer moved
+        let answer_parent_cache = [];
+        answers.forEach(element => {
+            if (element.parent_node_id == node_id)
+            {
+                //If answers parent node moved put them in array
+                answer_parent_cache.push(element._id);
+            }
+        });
+
+        console.log(answer_parent_cache);
+
+        for (let i = 0; i < points.length; i++) 
+        {
+            //Bu node'un  outputu bul
+            if ( points[i].type == "output" && answer_parent_cache.includes(points[i].parent_node_id))   
+            {
+                point_cache =  points[i]._id;
+
+                //Bulunan pointe bağlı pathları bul
+                for(let j=0; j<paths.length; j++)
+                {
+                    //Bulunan pathı güncelle
+                    if ( paths[j].parent_point_id == point_cache )
+                    {
+                        let update_path = document.getElementById(paths[j]._id);
+                        let all_points = update_path.getAttribute("d").split(" ");
+
+                        let rect = document.getElementById(point_cache).getBoundingClientRect();
+                        let startx = rect.left + 7 + window.scrollX;
+                        let starty = rect.top + 7 + window.scrollY;
+                        let endx = parseInt( all_points[2].split(",")[0] );
+                        let endy = parseInt( all_points[2].split(",")[1] );
+                        let curvex = Math.abs( (endx-startx)/2 );
+                        if (curvex<50)
+                        { curvex = 50; }
+
+
+                        let coords = "M" +startx + "," + starty 
+                        +" C"+ (startx+curvex) + "," + starty
+                        +","+ (endx-curvex) + "," + endy   
+                        +" "+ endx + "," + endy;
+
+                        update_path.setAttribute("d",coords);
+                        
+                    }
+                }
+            }
+        }
+    }
 }
 
 //---------------------------------------

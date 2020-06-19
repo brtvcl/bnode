@@ -1,0 +1,23 @@
+background: #252740
+bg-primart: #404768
+bg-secondary:#2c314b;
+
+node-body    : #2c3137
+node-section : #304050
+node-element : #80959e
+node-cancel-button : #fa6b83
+node-link : #e9ff5c
+
+text-node-secondary : #9aa2cb
+text-node-header : #2c3137
+
+
+node-title-purple : #743fd7
+node-title-pink   : #d73fcc
+node-title-red    : #d73f5f
+node-title-orange : #d78c3f
+node-title-yellow : #e3dd43
+node-title-green  : #48d73f
+node-title-mint   : #3fd7a3
+node-title-cyan   : #3f9dd7
+node-title-blue   : #4e3fd7

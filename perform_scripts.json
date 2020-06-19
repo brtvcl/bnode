@@ -1,0 +1,8 @@
+{
+    "script_name":"perform_move",
+    "arguments":"4",
+    "arg0":"real",
+    "arg1":["real","-1"],
+    "arg2":["slow","fast"],
+    "arg3":"string"
+}
