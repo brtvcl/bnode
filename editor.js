@@ -9,6 +9,44 @@ let speaks   = [];
 let answers  = [];
 
 
+function populate_script_list(element_id)
+{
+    let dropdown = document.getElementById(element_id);
+    dropdown.length = 0;
+
+    let default_option = document.createElement('option');
+    default_option.text = 'Script';
+
+    dropdown.add(default_option);
+    dropdown.selectedIndex = 0;
+
+    const url = 'perform_scripts.json';
+
+    fetch(url)  
+    .then(  
+      function(response) {  
+        if (response.status !== 200) {  
+          console.warn('Looks like there was a problem. Status Code: ' + 
+            response.status);  
+          return;  
+        }
+  
+        //Response text'i muayene et  
+        response.json().then(function(data) {  
+          let option;
+      
+          for (let i = 0; i < data.length; i++) {
+            option = document.createElement('option');
+              option.text = data[i].name;
+              //option.value = data[i]._id;
+              dropdown.add(option);
+          }    
+        });  
+      }  
+    )  
+
+
+}
 //---------------------------------------
 //INDEX INPUT START
 //--------------------------------------
@@ -60,6 +98,8 @@ function Perform(_id, parent_node_id, value)
     newPerformInput.appendChild(newPerformOption);
     
     
+    populate_script_list(this._id);
+
     for (let repeat = 0; repeat < 5; repeat++) 
     {
         for (let i = 0; i <= args.length; i++) 
