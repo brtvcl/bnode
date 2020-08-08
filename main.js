@@ -17,14 +17,30 @@ document.addEventListener("mousedown", moveStart, false);
 {
 
     var svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
-    svg.setAttribute("width","1280px");
-    svg.setAttribute("height","620px");
+    svg.setAttribute("width",window.innerWidth);
+    svg.setAttribute("height",window.innerHeight);
     svg.style.position = "absolute";
     svg.style.top=0;
     svg.style.left=0;
     svg.style.zIndex=1;
     svg.style.pointerEvents="none";
-    document.getElementById("container").appendChild(svg);   
+    let container = document.getElementById("container"); 
+    container.appendChild(svg); 
+    
+    //Update SVG
+    function update_workspace()
+    {
+        svg.style.width = window.innerWidth + window.scrollX + "px";
+        svg.style.height= window.innerHeight + window.scrollY + "px";
+        container.style.width = window.innerWidth + window.scrollX + "px";
+        container.style.height= window.innerHeight-container.offsetTop + window.scrollY +"px";
+
+    }
+
+    //window update event listener  
+    window.onresize = update_workspace;
+    window.onscroll = update_workspace;
+
 }
 
 //--------------------------------------------------
@@ -64,14 +80,36 @@ function Node(_id)
     delBtn.setAttribute("id","del"+_id.slice(4,7));
     newNodeHeader.appendChild(delBtn);
 
+    //Grid
+    let grid = document.createElement("div");
+    grid.setAttribute("class","grid");
+    newNode.appendChild(grid);
+
+    
+    //input grid left item
+    //Input point instance
+    let item = document.createElement("div");
+    item.setAttribute("class","item left");
+    grid.appendChild(item);
+    let ipoint = add_point("input",_id);
+    item.appendChild(ipoint);
+
+    //node body grid item
+    item = document.createElement("div");
+    item.setAttribute("class","item mid");
+    grid.appendChild(item);
+    
+    //output grid item
     //Output point instance
     //empty indise yada yeni indise point ekle
+    item = document.createElement("div");
+    item.setAttribute("class","item right");
+    grid.appendChild(item);
     let opoint = add_point("output",_id);
-    newNode.appendChild(opoint);
+    item.appendChild(opoint);
 
-    //Input point instance
-    let ipoint = add_point("input",_id);
-    newNode.appendChild(ipoint);
+    
+
 
 
 }
@@ -213,7 +251,7 @@ function nodeSil(del)
             //var all_paths = document.getElementsByClassName(delNode.getAttribute("id"));
             for(let j = 0; j < paths.length; j++)
             {
-                if (paths[j].parent_point_id == points[i]._id)
+                if (paths[j].parent_point_id == points[i]._id || paths[j].target_point_id == points[i]._id)
                 {
                     path_to_del = document.getElementById(paths[j]._id);
                     path_to_del.remove();

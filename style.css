@@ -24,7 +24,6 @@
     --c-mint:#3fd7a3;
   }
 
-
 #container 
 {
     width: 1280px;
@@ -39,6 +38,15 @@
     background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
     background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
 }
+
+
+.grid{
+    display: grid;
+    grid-template-columns: auto auto auto;
+  }
+  .item {
+    text-align: center;
+  }
 
 /*Node link*/
 path
@@ -84,7 +92,7 @@ path
 {
     margin-top:20px;
     margin-right:-7px;
-    float:right;
+    
     border: solid var(--c-border) 2px;
 }
 
@@ -94,6 +102,8 @@ path
     margin-left:-7px;
     float:left;
 }
+
+
 
 #a
 {
@@ -110,7 +120,7 @@ path
 .node 
 {
     width: 200px;
-    height: 150px;
+    padding-bottom: 10px;
     position: absolute;
     background-color: var(--c-node-body);
     border-radius: 10px;
@@ -119,11 +129,11 @@ path
   
 .nodeheader
 {
-    width: 200px;
+    width: auto;    
     height: 35px;
     cursor: grab;
     background-color: var(--c-mint);
-    border-radius: 10px 10px 0px 0px;
+    border-radius: 8px 8px 0px 0px;
 }
   
 .nodeheader:active
@@ -136,4 +146,39 @@ path
     background-color: var(--c-node-section);
     margin-top: 10px;
     padding-top:5px;
+}
+
+input, select, textarea{
+    width: 90%;
+    padding: 4px;
+    margin-left: 10px;
+    margin-right:10px;
+    margin-top:10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    resize: vertical;
+  }
+
+.index 
+{
+    width: 40px;
+    padding: 4px;
+    margin-top:5px;
+    background: var(--c-mint);
+    box-shadow: none;
+    border: none;
+    text-align: center;
+    color: white;
+}
+
+button 
+{
+    background-color: var(--c-purple);
+    color: white;
+    padding: 4px;
+    border: none;
+    margin: 10px 10px 0px 10px;
+    border-radius: 4px;
+    cursor: pointer;
 }

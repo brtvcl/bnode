@@ -1,11 +1,149 @@
-[{
-    "name": "perform_move",
-    "arguments": "4",
-    "arg0":"real"
+[
+
+  {
+    "name": "heal",
+    "args": ["real"]
   },
   {
-    "name": "perform_dont",
-    "arguments": "3",
-    "arg0":"real"
-  }
+    "name" : "coin_trade",
+    "description" : "Para alışverişi, eklenecek para değeri yazılır",
+    "args" : ["real"]
+  },
+  {
+    "name" : "move_towards",
+    "description" : "Objeyi verilen konuma ilerletir",
+    "args" : ["real","real","real","id"]
+  },
+  {
+    "name" : "create",
+    "description" : "Perform türü obje oluşturur",
+    "args" : ["real","real","real"]
+  },
+  {
+    "name" : "switch",
+    "description" : "NPC yada Cutscene aktif/deaktif etmek",
+    "args" : ["bool","real"]
+  },
+  {
+    "name" : "state_change",
+    "description" : "State değiştirme",
+    "args" : ["id","real"]
+  },
+  {
+    "name" : "animation",
+    "description" : "Sprite değiştirme",
+    "args" : ["id","sprite","real"]
+  },
+  {
+    "name" : "delay",
+    "description" : "Gecikme oluştur",
+    "args" : ["real"]
+  },
+  {
+    "name" : "cammove",
+    "description" : "Kamera hareketi",
+    "args" : ["real","real","string","string","real"]
+   },
+   {
+    "name" : "4waysprite",
+    "description" : "Sprite_index'i player konumuna göre 4 yön için değiştirme",
+    "args" : ["real","real","real","real","id"]
+   },
+   {
+     "name" : "talk",
+     "description" : "Diyalog parçası",
+     "args" : ["string"]
+   },
+   {
+     "name" : "del_cutscn",
+     "description" : "Cutscene objesi silme",
+     "args" : ["id"]
+   },
+   {
+     "name" : "check_sword",
+     "description" : "Player'ın kılıcına göre akışını değiştir",
+     "args" : ["real","string","i","i"]
+   },
+   {
+     "name" : "check_item",
+     "description" : "Player'ın itemine göre akışını değiştir",
+     "args" : ["real","i","i"]
+   },
+   {
+     "name" : "check_mode",
+     "description" : "Bir Cutscene'in moduna göre akışı değiştir",
+     "args" : ["real","id","i","i"]
+   },
+   {
+    "name" : "check_destiny",
+    "description" : "Destiny değerine göre akışı değiştir",
+    "args" : ["real","real","real","i","i"]
+   },
+   {
+     "name" : "check_route",
+     "description" : "Route değerine göre akışı değiştir",
+     "args" : ["real","real","real","i","i"]
+   },
+   {
+     "name" : "check_carry",
+     "description" : "Carry değerine göre akışı değiştir",
+     "args" : ["real","i","i"]
+   },
+   {
+     "name" : "set_i",
+     "description" : "cutscene yada npc i değerini değiştirme",
+     "args" : ["i","id"]
+   },
+   {
+    "name" : "set_i_start",
+    "description" : "cutscene yada npc i start değerini değiştirme",
+    "args" : ["i","id"]
+   },
+   {
+    "name" : "set_image_index",
+    "description" : "image_index değiştirme",
+    "args" : ["id","real"]
+   },
+   {
+    "name" : "set_speed",
+    "description" : "speed değiştirme",
+    "args" : ["id","real"]
+   },
+   {
+    "name" : "set_carry",
+    "description" : "carry değiştirme",
+    "args" : ["real"] 
+   },
+   {
+    "name" : "set_mode",
+    "description" : "cutscene mode değiştirme",
+    "args" : ["real","id"]
+   },
+   {
+     "name" : "set_route",
+     "description" : "route değiştirme",
+     "args" : ["real","real","real"]
+   },
+   {
+    "name" : "set_destiny",
+    "description" : "destiny değiştirme",
+    "args" : ["real","real","real"]
+   },
+   {
+     "name" : "ds_map_replace",
+     "description" : "bir ds_map'in key alanını değiştirme",
+     "args" : ["real","real"]
+   },
+   {
+     "name" : "show_cinematic",
+     "description" : "cinematic resimlerini gösterme, arg0 ve arg1 için -1 ekran ortası",
+     "args" : ["real","real","real","real","real"]
+   },
+   {
+    "name" : "gui_display",
+    "description" : "gui kapat/aç",
+    "args" : ["bool"]
+   }
+
+
 ]

@@ -7,8 +7,16 @@ let performs = [];
 let args     = [];
 let speaks   = [];
 let answers  = [];
+let script_data= [];
 
+function Script_data(name, description, args)
+{
+    this.name = name;
+    this.description = description;
+    this.args = args;
+}
 
+//Script dropdown listesine JSON verilerini ekle
 function populate_script_list(element_id)
 {
     let dropdown = document.getElementById(element_id);
@@ -32,15 +40,19 @@ function populate_script_list(element_id)
         }
   
         //Response text'i muayene et  
-        response.json().then(function(data) {  
+        response.json().then(function(json_data) 
+        {  
           let option;
-      
-          for (let i = 0; i < data.length; i++) {
-            option = document.createElement('option');
-              option.text = data[i].name;
-              //option.value = data[i]._id;
-              dropdown.add(option);
-          }    
+        
+            for (let i = 0; i < json_data.length; i++) 
+            {
+                option = document.createElement('option');
+                option.text = json_data[i].name;
+                option.value = i;
+                script_data[i] = new Script_data(json_data[i].name, json_data[i].description, json_data[i].args);
+                dropdown.add(option);
+               
+            }  
         });  
       }  
     )  
@@ -71,8 +83,8 @@ function Speak(_id, parent_node_id, value)
          console.log(speaks);
         });
 
-    //Append to parent node
-    document.getElementById(parent_node_id).appendChild(newSpeakInput);
+    //Append to answer & main node
+    document.getElementById(parent_node_id).getElementsByClassName("item mid")[0].appendChild(newSpeakInput);
 }
 
 //Perform input object
@@ -85,18 +97,48 @@ function Perform(_id, parent_node_id, value)
     let newPerformInput = document.createElement("select");
     newPerformInput.setAttribute("id",this._id);
 
-    document.getElementById(parent_node_id).appendChild(newPerformInput); 
+    //When value updated change argument inputs accordingly and write value in array
+    newPerformInput.addEventListener("change",function()
+    {
+        //Write element value in array;
+        performs[_id].value = newPerformInput.value;
 
-    let newPerformOption = document.createElement("option");
-    newPerformOption.setAttribute("value","perform1");
-    newPerformOption.innerHTML = "perform1";
-    newPerformInput.appendChild(newPerformOption); 
+        //Seçilen scriptin script_data içindeki indexi selected' içinde tut
+        let selected = newPerformInput.options[newPerformInput.selectedIndex].value;
+        
+        //Tüm arguman elementleri içinden bu scripte ait olanları bul
+        //Ve arguman sayısına göre bunları 'görünmez' yap (display:none)
+        //5 arguman inputu içinde bunu tekrarla
+        for (let i = 0; i < 5; i++) {
+            args.forEach(element => {
+                if (_id == element.parent_perform_index)
+                {
+                    if (element.arg_number >= script_data[selected].args.length)
+                    {
+                        //arguman sayısı uyuşmuyorsa bu inputu gizle
+                        document.getElementById(element._id).style.display = "none";
+                    }
+                    else
+                    {
+                        // arguman sayısı uyuyorsa bu inputları tipine göre değiştir
+                        let el = document.getElementById(element._id); 
+                        el.style.display = "block";
+                        el.value = script_data[selected].args[element.arg_number];
+                        switch (script_data[selected].args[element.arg_number]) 
+                        {
+                            case "real": el.type = "number"; break;
+                            case "string" : el.type = "text"; break; 
+                            default: el.type = "text"; break;
+                        }                    
+                    }
+                }
+            });
+        }
+    });
 
-    newPerformOption = document.createElement("option");
-    newPerformOption.setAttribute("value","perform1");
-    newPerformOption.innerHTML = "perform2";
-    newPerformInput.appendChild(newPerformOption);
-    
+
+    //Perform Script dropdown append 
+    document.getElementById(parent_node_id).getElementsByClassName("item mid")[0].appendChild(newPerformInput); 
     
     populate_script_list(this._id);
 
@@ -138,7 +180,7 @@ function Arg(_id,parent_perform_index,parent_node_id,arg_number,value)
        });
 
     //Append to parent node
-    document.getElementById(parent_node_id).appendChild(new_arg_input);
+    document.getElementById(parent_node_id).getElementsByClassName("item mid")[0].appendChild(new_arg_input);
 
 }
 //--------------------------------------
@@ -148,12 +190,13 @@ function Index(_id, parent_node_id, value)
     //Constructors
     this._id = "index"+_id;
     this.parent_node_id = parent_node_id;
-    this.value = value;
+    this.value = String(value);
 
     //DOM Element
     let newIndexInput = document.createElement("input");
     newIndexInput.setAttribute("type","number");
     newIndexInput.setAttribute("id",this._id);
+    newIndexInput.setAttribute("class","index");
     newIndexInput.setAttribute("value",value);
 
     //addEventListener so When input entered update value 
@@ -163,8 +206,8 @@ function Index(_id, parent_node_id, value)
     console.log(indexes);
     });
     
-    //Appent to node
-    document.getElementById(parent_node_id).appendChild(newIndexInput);    
+    //Appent to node's mid grid item
+    document.getElementById(parent_node_id).getElementsByClassName("nodeheader")[0].appendChild(newIndexInput);    
 
 }
 
@@ -174,15 +217,23 @@ function Answer(_id,parent_node_id)
     this._id = "answer"+_id;
     this.parent_node_id = parent_node_id;
 
-    //DOM Element create
+    //DOM Answer Grid Element create
     let newAnswerInput = document.createElement("div");
-    newAnswerInput.setAttribute("class","answer");
+    newAnswerInput.setAttribute("class","grid answer");
     newAnswerInput.setAttribute("id",this._id);
+
+    //Item mid
+    let newItemMid = document.createElement("div");
+    newItemMid.setAttribute("class","item mid");
+    newAnswerInput.appendChild(newItemMid);
+
+    //Item right (answer output)
+    let newItemRight = document.createElement("div");
+    newItemRight.setAttribute("class","item right");
+    newAnswerInput.appendChild(newItemRight);
 
     //Appent to parent node
     document.getElementById(parent_node_id).appendChild(newAnswerInput);
-    newAnswerInput.appendChild(document.createElement("hr"));
-
 
     //Text
     /*
@@ -223,10 +274,11 @@ function removeDefaultInput(i)
     speaks[i].parent_node_id  = "empty";
     speaks[i].value           = "empty";   
     
+    /*
     performs[i]._id           = "empty";
     performs[i].parent_node_id= "empty";
     performs[i].value         = "empty";
-    
+    */
 
 }
 
@@ -254,7 +306,7 @@ function removeDefaultInput(i)
         perform_add_btn.setAttribute("id",id_name+btn_index);
         
         //Append button to DOM
-        document.getElementById(parent_id).appendChild(perform_add_btn);
+        document.getElementById(parent_id).getElementsByClassName("item mid")[0].appendChild(perform_add_btn);
 
         //Add EventListener
         perform_add_btn.addEventListener("click", add_perform_input.bind(null, parent_id, id_name+btn_index));
@@ -283,8 +335,17 @@ function removeDefaultInput(i)
         prf_del_btn.setAttribute("id","prf_del_btn"+perform_index);
         prf_del_btn.innerHTML = "X";
         prf_del_btn.addEventListener("click", del_perform_input.bind(null, parent_id, perform_index));
-        document.getElementById(parent_id).appendChild(prf_del_btn);
+        document.getElementById(parent_id).getElementsByClassName("item mid")[0].appendChild(prf_del_btn);
 
+        //Perform script parent node silinince verileri sil
+        //Silme butonunu bul
+        if (parent_id.includes("node"))
+        {
+            delid = parent_id.slice(4,8);
+            delelement = document.getElementById("del"+delid);
+            //silme event listener ekle
+            delelement.addEventListener("click",del_perform_input.bind(null, parent_id, perform_index));    
+        }
         //Remvoe "add '+' " button
         document.getElementById(button_id).remove();
 
@@ -300,7 +361,8 @@ function removeDefaultInput(i)
         {
             if ( args[i]!=undefined && args[i]!="empty" && args[i].parent_perform_index==perform_index)
             {
-                document.getElementById(args[i]._id).remove();
+                if (!!document.getElementById("perform"+perform_index)) 
+                {document.getElementById(args[i]._id).remove();}
                 args[i]._id = "empty";
                 args[i].parent_perform_index = "empty";
                 args[i].arg_number = "empty";
@@ -308,15 +370,19 @@ function removeDefaultInput(i)
             }
         }
 
-        document.getElementById("prf_del_btn"+perform_index).remove();
-        document.getElementById("perform"+perform_index).remove();
-
+        
         performs[perform_index]._id = "empty";
         performs[perform_index].parent_node_id = "empty";
         performs[perform_index].value = "empty";
 
+        
+        if (!!document.getElementById("perform"+perform_index)) 
+        {
+            document.getElementById("prf_del_btn"+perform_index).remove();
+            document.getElementById("perform"+perform_index).remove();
+            add_perform_button(parent_id);
+        }
 
-        add_perform_button(parent_id);
         console.log(performs);
         console.log(args);
     }
@@ -344,7 +410,7 @@ function removeDefaultInput(i)
         answer_add_btn.setAttribute("id",id_name+btn_index);
 
         //Append button to DOM
-        document.getElementById(parent_id).appendChild(answer_add_btn);
+        document.getElementById(parent_id).getElementsByClassName("item mid")[0].appendChild(answer_add_btn);
         
         //Add event listener
         answer_add_btn.addEventListener("click",add_answer_input.bind(null, parent_id, id_name+btn_index));
@@ -385,18 +451,26 @@ function removeDefaultInput(i)
                 answer_index++;
             }
 
+            let answer_element = document.getElementById("answer"+answer_index);
             //Add answer output
+            console.log(parent_id);
             let apoint = add_point("output","answer"+answer_index);
-            document.getElementById("answer"+answer_index).appendChild(apoint);
+            answer_element.getElementsByClassName("item right")[0].appendChild(apoint);
             console.log(points);
 
-
+            //Perform script parent node silinince verileri sil
+            //Silme butonunu bul
+            delid = parent_id.slice(4,8);
+            delelement = document.getElementById("del"+delid);
+            //silme event listener ekle
+            delelement.addEventListener("click",del_answer_input.bind(null, parent_id, answer_index));    
+        
             //Add delete button
             let answ_del_btn = document.createElement("button");
             answ_del_btn.innerHTML = "X";
             answ_del_btn.setAttribute("id","answ_del_btn"+answer_index);
             answ_del_btn.addEventListener("click",del_answer_input.bind(null,parent_id,answer_index));
-            document.getElementById(parent_id).appendChild(answ_del_btn);
+            answer_element.getElementsByClassName("item mid")[0].appendChild(answ_del_btn);
             
         }
 
@@ -406,23 +480,64 @@ function removeDefaultInput(i)
 
     function del_answer_input(parent_id, answer_index)
     {
-
-        //Remove array list here!!
         
+        let answer_id = "answer"+answer_index;
+        //Remove array list here!!
+
         answers[answer_index].parent_node_id = "empty";
         answers[answer_index]._id = "empty";
         console.log(answers);
 
-        //Remove answer elements
-        document.getElementById("answer"+answer_index).remove();
+        //Remove speak data of this answer
+        for (let i = 0; i < speaks.length; i++) 
+        {
+            if (speaks[i].parent_node_id==answer_id) 
+            {
+                speaks[i]._id             = "empty";
+                speaks[i].parent_node_id  = "empty";
+                speaks[i].value           = "empty";    
+            }    
+            
+        }
+        //Remove point data of this answer
+        for (let i = 0; i < points.length; i++) 
+        { 
+            //Bu nodeun pointi bul
+            if (points[i].parent_node_id == answer_id)
+            {
+                //Point'e ait pathları sil
+                //var all_paths = document.getElementsByClassName(delNode.getAttribute("id"));
+                for(let j = 0; j < paths.length; j++)
+                {
+                    if (paths[j].parent_point_id == points[i]._id)
+                    {
+                        path_to_del = document.getElementById(paths[j]._id);
+                        path_to_del.remove();
+                        paths[j] = new Path("empty", "empty", "empty"); //verileri sil
+                    }
+                }
 
+                points[i] = new Point("empty", "empty", "empty");
+            }
+        }
+
+        for (let i = 0; i < performs.length; i++) 
+        {
+            if (performs[i].parent_node_id == answer_id)
+            {
+                del_perform_input(answer_id,i);
+            }
+        }
+
+        //Remove answer elements
+        if (!!document.getElementById("answer"+answer_index)) 
+        {
+            document.getElementById("answer"+answer_index).remove();
+        }
         //Add add button
         /*
         add_answer_button(parent_node_index,answer_index);
         */
-
-        //Remove delete button
-        document.getElementById("answ_del_btn"+answer_index).remove();
         
     }
 
