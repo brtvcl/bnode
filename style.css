@@ -8,21 +8,30 @@
 
 :root {
 
-    --c-bg-color:#252740;
-    --c-bg-primary:#404768;
-    --c-bg-secondary:#2c314b;
+    --c-bg-color:#141321;
+    --c-bg-primary:#266c7a;
+    --c-bg-secondary:#113e51;
 
-    --c-node-body: #2c3137;
+    --c-node-body: #133c4e;
     --c-node-section:#304050;
     --c-node-element:#80959e;
     --c-node-cancel-button:#fa6b83;
     --c-node-link:#e9ff5c;
 
-    --c-border:white;
+    --c-border:#27fef9;
 
-    --c-purple:#743fd7;
-    --c-mint:#3fd7a3;
+    --c-aqua   : #27fef9;
+    --c-turquoise:#158f9a;
+    --c-purple : #743fd7;
+    --c-mint   : #3fd7a3;
+    --c-orange : #d64310;
+    --c-yellow : #d1c138;
   }
+
+body 
+{
+    background-color:var(--c-bg-color);
+}
 
 #container 
 {
@@ -76,7 +85,22 @@ path
 
 .btn
 {
-    width:40px;
+    border: 0.1vw solid var(--c-aqua);
+    background-color: var(--c-bg-color);
+    padding: 0.8vw 1.6vw;
+    font-size: 1.2vw;
+    line-height: 1.2vw;
+    cursor: pointer;
+    border-radius: 0px;
+    margin : 0.4vw;
+    font-size-adjust: none;
+}
+
+#result
+{
+    background-color: var(--c-bg-color);
+    border:0.1vw solid var(--c-aqua);
+    margin : 0.5vw;
 }
 
 .connection
@@ -124,7 +148,7 @@ path
     position: absolute;
     background-color: var(--c-node-body);
     border-radius: 10px;
-    border: solid var(--c-border) 2px;
+    border: solid var(--c-border) 2px;   
 }
   
 .nodeheader
@@ -132,7 +156,7 @@ path
     width: auto;    
     height: 35px;
     cursor: grab;
-    background-color: var(--c-mint);
+    background-color: var(--c-turquoise);
     border-radius: 8px 8px 0px 0px;
 }
   
@@ -165,7 +189,7 @@ input, select, textarea{
     width: 40px;
     padding: 4px;
     margin-top:5px;
-    background: var(--c-mint);
+    background: var(--c-turquoise);
     box-shadow: none;
     border: none;
     text-align: center;
@@ -174,11 +198,17 @@ input, select, textarea{
 
 button 
 {
-    background-color: var(--c-purple);
+    background-color: var(--c-yellow);
     color: white;
     padding: 4px;
     border: none;
-    margin: 10px 10px 0px 10px;
+    margin: 5px 5px 0px 10px;
     border-radius: 4px;
     cursor: pointer;
+}
+
+button  
+{
+    -webkit-appearance: none;
+    border:none;
 }
