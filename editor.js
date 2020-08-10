@@ -1,7 +1,7 @@
 //Cutscene editor js
 
 document.getElementById("addNode").addEventListener("click",addDefaultInput);
-
+//commit
 let indexes  = [];
 let performs = [];
 let args     = [];
