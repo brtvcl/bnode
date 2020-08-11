@@ -3,7 +3,6 @@
     margin:0px;
     padding:0px;
     box-sizing: border-box;
-    
 }
 
 :root {
@@ -26,6 +25,8 @@
     --c-mint   : #3fd7a3;
     --c-orange : #d64310;
     --c-yellow : #d1c138;
+
+    --c-text-main : white;
   }
 
 body 
@@ -35,9 +36,9 @@ body
 
 #container 
 {
-    width: 1280px;
-    height: 620px;
-    border: 2px solid lightgray;
+    width: 100%;
+    height:100%;
+    transform-origin: top left;
     background-color: var(--c-bg-color);
     background-image:
       linear-gradient( var(--c-bg-primary) 2px, transparent 2px),
@@ -91,9 +92,24 @@ path
     font-size: 1.2vw;
     line-height: 1.2vw;
     cursor: pointer;
-    border-radius: 0px;
+    border-radius: 0px; 
     margin : 0.4vw;
     font-size-adjust: none;
+    color: var(--c-text-main);  
+}
+
+button:focus
+{
+    border: 0.1vw solid var(--c-aqua);
+    background-color: var(--c-bg-color);
+    padding: 0.8vw 1.6vw;
+    font-size: 1.2vw;
+    line-height: 1.2vw;
+    cursor: pointer;
+    border-radius: 0px; 
+    margin : 0.4vw;
+    font-size-adjust: none;
+    color: var(--c-text-main); 
 }
 
 #result
@@ -149,6 +165,7 @@ path
     background-color: var(--c-node-body);
     border-radius: 10px;
     border: solid var(--c-border) 2px;   
+    transform-origin: top left;
 }
   
 .nodeheader

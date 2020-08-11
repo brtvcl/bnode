@@ -7,6 +7,12 @@ let nodes  = [];
 let paths  = [];
 let points = []; 
 
+let zoom_amount = 1;
+let container_rect = document.getElementById("container").getBoundingClientRect();
+
+Math.clamp = function(number, min, max) {
+    return Math.max(min, Math.min(number, max));
+  }
 
 document.addEventListener("mouseup", moveEnd, false);
 document.addEventListener("mousemove", move, false);
@@ -24,22 +30,39 @@ document.addEventListener("mousedown", moveStart, false);
     svg.style.left=0;
     svg.style.zIndex=1;
     svg.style.pointerEvents="none";
+    
     let container = document.getElementById("container"); 
     container.appendChild(svg); 
-    
-    //Update SVG
-    function update_workspace()
-    {
-        svg.style.width = window.innerWidth + window.scrollX + "px";
-        svg.style.height= window.innerHeight + window.scrollY + "px";
-        container.style.width = window.innerWidth + window.scrollX + "px";
-        container.style.height= window.innerHeight-container.offsetTop + window.scrollY +"px";
+    container.style.width = "1500px";
+    container.style.height = "850px";
 
+    
+
+    let canvas = document.getElementById("canvas");
+    canvas.style.overflow = "scroll";
+
+    //Zoom to workspace
+    function workspace_zoom(event)
+    {
+        
+        event.passive = false;
+        event.preventDefault();
+        if (event.altKey)
+        {
+            zoom_amount -= event.deltaY/1000;
+            zoom_amount = Math.clamp(zoom_amount,0.1,10);
+            container.style.transform = `scale(${zoom_amount})`;
+            container.style.width = 1500/zoom_amount+"px";
+            container.style.height = 850/zoom_amount+"px";
+
+            console.log("zoom:",zoom_amount,"width:",window.innerWidth,", height:",window.innerHeight);
+            console.log("container.width:",container.style.width);
+            //console.log("container.real_width:",)
+        }
+        
     }
 
-    //window update event listener  
-    window.onresize = update_workspace;
-    window.onscroll = update_workspace;
+    window.addEventListener("wheel",function(e) {workspace_zoom(e);},{passive:false});
 
 }
 
@@ -276,14 +299,13 @@ function snap_to_input(self_id)
     //Path'ın çıktığı output self_id oluyor
     let range = 40;
 
+
     //Aynı node'un kendisine bağlanmaması için parenti bul
     for (let i = 0; i < points.length; i++) 
     {
         if (points[i]._id==self_id)
         {
-            console.log(points[i].parent_node_id);
             point_parent_cache = points[i].parent_node_id;
-            console.log("Parent'e snaplenmez");
         }
         
     }
@@ -294,12 +316,12 @@ function snap_to_input(self_id)
         {
             let pos_of_input = document.getElementById(points[k]._id).getBoundingClientRect();
             console.log(pos_of_input);
-            if ( Math.abs(pos_of_input.left+window.scrollX-endx)<range && Math.abs(pos_of_input.top+window.scrollY-endy)<range  )
+            if ( Math.abs((pos_of_input.left-container_rect.left)/zoom_amount-endx)<range && Math.abs((pos_of_input.top-container_rect.top)/zoom_amount-endy)<range  )
             {
                 console.log("Yaklaştı");
                 console.log(points);
-                endx = pos_of_input.left+7+window.scrollX;
-                endy = pos_of_input.top+7+window.scrollY;
+                endx = (pos_of_input.left+7-container_rect.left) / zoom_amount;
+                endy = (pos_of_input.top+7-container_rect.top) / zoom_amount;
 
                 for (let m = 0; m < paths.length; m++) 
                 {
@@ -352,8 +374,9 @@ function moveStart(e)
         active = true;//Sürükleme switchi aç
 
         //Grab konum offset
-        offsetx = (e.x + scrollX - node.offsetLeft);
-        offsety = (e.y + scrollY - node.offsetTop);
+        offsetx = (e.x-container_rect.left)/zoom_amount-node.offsetLeft;
+        offsety = (e.y-container_rect.top)/zoom_amount-node.offsetTop;
+        console.log("off.x:",offsetx,", off.y:",offsety);
         
     }
 
@@ -438,15 +461,22 @@ function moveStart(e)
 //Mouse move event
 function move(e)
 {
-    editor_move();
+    editor_move(); //editor.js
+
     //Node sürükle
     if (active)
     {
 
-        //Node konum update
-        node.style.left = (e.x + scrollX - offsetx) + "px";
-        node.style.top  = (e.y + scrollY - offsety) + "px";
-        
+        //Node konum update 
+        node.style.left = (e.x - container_rect.left ) / zoom_amount - offsetx + "px";
+        node.style.top  = (e.y - container_rect.top ) / zoom_amount - offsety + "px";
+
+        console.log("e.y:",e.y);
+        console.log("rect_top:",container_rect.top);
+        console.log("offsety:",offsety);
+        console.log("offsetx:",offsetx);
+        console.log("zoom:",zoom_amount);
+
         console.log(paths);
         console.log(points);
         console.log(nodes);
@@ -470,8 +500,8 @@ function move(e)
                         let all_points = update_path.getAttribute("d").split(" ");
 
                         let rect = document.getElementById(point_cache).getBoundingClientRect();
-                        let startx = rect.left + 7 + window.scrollX;
-                        let starty = rect.top + 7 + window.scrollY;
+                        let startx = (rect.left+(7*zoom_amount) - container_rect.left) / zoom_amount;
+                        let starty = (rect.top +(7*zoom_amount) - container_rect.top) / zoom_amount;
                         let endx = parseInt( all_points[2].split(",")[0] );
                         let endy = parseInt( all_points[2].split(",")[1] );
                         let curvex = Math.abs( (endx-startx)/2 );
@@ -504,8 +534,8 @@ function move(e)
                         let all_points = update_path.getAttribute("d").split(" ");
 
                         let rect = document.getElementById(point_cache).getBoundingClientRect();
-                        let endx = rect.left + 7 + window.scrollX;
-                        let endy = rect.top + 7 + window.scrollY;
+                        let endx = (rect.left + (7*zoom_amount) - container_rect.left) / zoom_amount;
+                        let endy = (rect.top + (7*zoom_amount) - container_rect.top) / zoom_amount;   
                         let startx = Number(all_points[0].slice(1,99).split(",")[0]);
                         let starty = Number(all_points[0].slice(1,99).split(",")[1]);
                         let curvex = Math.abs( (endx-startx)/2 );
@@ -530,12 +560,13 @@ function move(e)
     if (pointdrag)
     {
         let rect  = point.getBoundingClientRect();
-        let startx = rect.left+7 + window.scrollX;
-        let starty = rect.top+7 + window.scrollY;
+        let startx = (rect.left+(7*zoom_amount) - container_rect.left) / zoom_amount;
+        let starty = (rect.top+(7*zoom_amount) - container_rect.top) / zoom_amount;
 
         //End pozisyon i mouse konumu yap
-        endx = e.x + window.scrollX;
-        endy = e.y + window.scrollY;
+        endx = (e.x - container_rect.left ) / zoom_amount;
+        endy = (e.y - container_rect.top ) / zoom_amount;
+
 
         let curvex = Math.abs( (endx-startx)/2 );
         if (curvex<50)
